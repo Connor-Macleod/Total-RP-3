@@ -1,0 +1,11 @@
+## Interface: 70100
+## Title: Total RP 3: Bookworm
+## Author: Ellypse
+## Version: 1.0
+## URL: https://totalrp3.info
+## RequiredDeps: totalRP3, totalRP3_Extended
+## DefaultState: Enabled
+## LoadOnDemand: 0
+
+totalRP3_Bookworm.xml
+

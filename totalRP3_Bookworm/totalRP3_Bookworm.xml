@@ -1,0 +1,45 @@
+<Ui>
+	<Button name="TRP3_BookwormButton" parent="UIParent" hidden="true">
+		<Size x="35" y="35"/>
+		<Anchors>
+			<Anchor point="TOPRIGHT" x="35" y="-45" relativeTo="ItemTextFrame"/>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface/SPELLBOOK/SpellBook-SkillLineTab">
+					<Anchors>
+						<Anchor point="CENTER" x="12" y="-4"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture parentKey="icon" file="Interface/ICONS/INV_Misc_Book_03">
+					<Size x="30" y="30"/>
+					<Anchors>
+						<Anchor point="CENTER" />
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture parentKey="checked" file="Interface/BUTTONS/UI-CheckBox-Check" hidden="true">
+					<Size x="30" y="30"/>
+					<Anchors>
+						<Anchor point="CENTER" />
+					</Anchors>
+				</Texture>
+				<Texture parentKey="highlight" file="Interface/BUTTONS/ButtonHilight-Square" alphaMode="ADD" hidden="true">
+					<Size x="30" y="30"/>
+					<Anchors>
+						<Anchor point="CENTER" />
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Button>
+
+	<Script file="Buttons.lua" />
+	<Script file="Book.lua" />
+	<Script file="Bookworm.lua" />
+	<Script file="totalRP3_Bookworm.lua" />
+
+</Ui>
