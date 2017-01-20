@@ -219,6 +219,19 @@ local function insertScansInDropdown(_, level)
 	end
 end
 
+-- Dirty bug fix for Blizzard's own code...
+-- Currently (7.1) the world map filter dropdown is randomly hidden by WORLD_MAP_UPDATE events (constantly fired on the Broken Isles)
+-- WorldMapLevelDropDown_Update is being called supposedly to show/hide the dungeon levels dropdown frame,
+-- yet when it initializes the dungeon levels dropdown it hides any currently visible dropdown.
+-- To workaround that we check if a dropdown is visible before initializing the dungeon level dropdown.
+-- Yes, that's dirty, but it's better than what we have now.
+local oldWorldMapLevelDropDown_Update = WorldMapLevelDropDown_Update
+function WorldMapLevelDropDown_Update()
+	if not DropDownList1:IsVisible() then
+		oldWorldMapLevelDropDown_Update();
+	end
+end
+
 local function registerScan(structure)
 	assert(structure and structure.id, "Must have a structure and a structure.id!");
 	SCAN_STRUCTURES[structure.id] = structure;
@@ -308,17 +321,68 @@ TRP3_API.events.listenToEvent(TRP3_API.events.WORKFLOW_ON_LOAD, function()
 	end);
 	TRP3_ScanLoaderFrame:SetScript("OnUpdate", function(self, elapsed)
 		self.refreshTimer = self.refreshTimer + elapsed;
-		local percent = math.ceil((self.refreshTimer / self.time) * 100);
-		-- TRP3_ScanLoaderFramePercent:SetText(percent .. "%");
 	end);
 
 	Utils.event.registerHandler("WORLD_MAP_UPDATE", onWorldMapUpdate);
 end);
 
-local CONFIG_MAP_BUTTON_POSITION = "MAP_BUTTON_POSITION";
-local getConfigValue, registerConfigKey = TRP3_API.configuration.getValue, TRP3_API.configuration.registerConfigKey;
-
 TRP3_API.events.listenToEvent(TRP3_API.events.WORKFLOW_ON_LOADED, function()
+
+	-- Hook the WorldMapTrackingOptionsDropDown_Initialize to add our own options inside the dropdown menu securely
 	hooksecurefunc("WorldMapTrackingOptionsDropDown_Initialize", insertScansInDropdown);
 	UIDropDownMenu_Initialize(WorldMapFrameDropDown, WorldMapTrackingOptionsDropDown_Initialize, "MENU");
+
+	after(5, function()
+
+		-- If the PetTracker add-on is installed it will mess with the world map filter dropdown by overriding it
+		-- removing all the options added by other add-ons... (╯°□°）╯︵ ┻━┻
+		-- Bad PetTracker, no cookie for you ☜(`o´)
+		-- So let's fix that shit, shall we? ٩(^ᴗ^)۶
+		if PetTracker then
+
+			-- First we restore the OnClick script of the filter button ┬─┬ノ( º _ ºノ)
+			WorldMapFrame.UIElementsFrame.TrackingOptionsButton.Button:SetScript('OnClick', function(self)
+				local parent = self:GetParent();
+				ToggleDropDownMenu(1, nil, parent.DropDown, parent, 0, -5);
+				PlaySound("igMainMenuOptionCheckBoxOn");
+			end)
+
+			-- Now, because we are nice (sort of),
+			-- we will insert PetTracker's options inside the dropdown the right way (✿°◡°)
+			hooksecurefunc("WorldMapTrackingOptionsDropDown_Initialize", function(self, level, ...)
+				if level==1 then
+					local info = UIDropDownMenu_CreateInfo()
+
+					UIDropDownMenu_AddSeparator(info);
+
+					info = UIDropDownMenu_CreateInfo();
+
+					-- Insert a nice header for PetTracker
+					info.isTitle = true;
+					info.notCheckable = true;
+					info.text = "PetTracker";
+					UIDropDownMenu_AddButton(info);
+
+					info = UIDropDownMenu_CreateInfo();
+
+					-- Toggle pets blips
+					info.text = PETS
+					info.func = function() PetTracker.WorldMap:Toggle('Species') end
+					info.checked = PetTracker.WorldMap:Active('Species')
+					info.isNotRadio = true
+					info.keepShownOnClick = true
+					UIDropDownMenu_AddButton(info)
+
+					-- Toggle stable blips
+					info.text = STABLES
+					info.func = function() PetTracker.WorldMap:Toggle('Stables') end
+					info.checked = PetTracker.WorldMap:Active('Stables')
+					info.isNotRadio = true
+					info.keepShownOnClick = true
+					UIDropDownMenu_AddButton(info)
+				end
+			end)
+			UIDropDownMenu_Initialize(WorldMapFrameDropDown, WorldMapTrackingOptionsDropDown_Initialize, "MENU")
+		end
+	end)
 end);

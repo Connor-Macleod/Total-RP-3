@@ -48,6 +48,7 @@ local TYPE_PET = TRP3_API.ui.misc.TYPE_PET;
 local TYPE_BATTLE_PET = TRP3_API.ui.misc.TYPE_BATTLE_PET;
 local EMPTY = Globals.empty;
 local unitIDToInfo = Utils.str.unitIDToInfo;
+local lightenColorUntilItIsReadable = Utils.color.lightenColorUntilItIsReadable;
 local isPlayerIC;
 local unitIDIsFilteredForMatureContent;
 
@@ -189,8 +190,6 @@ end
 -- UTIL METHOD
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-local localeFont;
-
 local function getGameTooltipTexts(tooltip)
 	local tab = {};
 	for j = 1, tooltip:NumLines() do
@@ -201,12 +200,16 @@ end
 TRP3_API.ui.tooltip.getGameTooltipTexts = getGameTooltipTexts;
 
 local function setLineFont(tooltip, lineIndex, fontSize)
-	_G[strconcat(tooltip:GetName(), "TextLeft", lineIndex)]:SetFont(localeFont, fontSize);
+	local line = _G[strconcat(tooltip:GetName(), "TextLeft", lineIndex)];
+	local font, _ , flag = line:GetFont();
+	line:SetFont(font, fontSize, flag);
 end
 
 local function setDoubleLineFont(tooltip, lineIndex, fontSize)
 	setLineFont(tooltip, lineIndex, fontSize);
-	_G[strconcat(tooltip:GetName(), "TextRight", lineIndex)]:SetFont(localeFont, fontSize);
+	local line = _G[strconcat(tooltip:GetName(), "TextRight", lineIndex)];
+	local font, _ , flag = line:GetFont();
+	line:SetFont(font, fontSize, flag);
 end
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -380,25 +383,13 @@ local function writeTooltipForCharacter(targetID, originalTexts, targetType)
 	local rightIcons = "";
 	local leftIcons = "";
 
-    local count = 0;
 
     -- Only use custom colors if the option is enabled and if we have one
     if getConfigValue(CONFIG_CHARACT_COLOR) and info.characteristics and info.characteristics.CH then
         r, g, b = Utils.color.hexaToFloat(info.characteristics.CH);
 
-        if getConfigValue(CONFIG_CHARACT_CONTRAST) then
-            -- If the color is too dark to be displayed in the tooltip, we will ligthen it up a notch
-            while not Utils.color.textColorIsReadableOnBackground({ r = r, g = g, b = b }) do
-                r = r + 0.01;
-                g = g + 0.01;
-                b = b + 0.01;
-                count = count + 1;
-            end
-
-            if r > 1 then r = 1 end
-            if g > 1 then g = 1 end
-            if b > 1 then b = 1 end
-        end
+		local lighten = lightenColorUntilItIsReadable({ r = r, g = g, b = b });
+		r, g, b = lighten.r, lighten.g, lighten.b;
     end
 
     -- Generate a color code string (|cffrrggbb) that we will use in the name and the class
@@ -992,7 +983,6 @@ TRP3_API.events.listenToEvent(TRP3_API.events.WORKFLOW_ON_LOAD, function()
 end);
 
 local function onModuleInit()
-	localeFont = TRP3_API.locale.getLocaleFont();
 	getCompanionProfile = TRP3_API.companions.player.getCompanionProfile;
 	getCompanionRegisterProfile = TRP3_API.companions.register.getCompanionProfile;
     isPlayerIC = TRP3_API.dashboard.isPlayerIC;

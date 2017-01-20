@@ -307,9 +307,13 @@ end
 
 local strsplit, UnitGUID = strsplit, UnitGUID;
 
-function Utils.str.getUnitDataFromGUID(unitID)
-	local unitType, _, _, _, _, npcID = strsplit("-", UnitGUID(unitID) or "");
+function Utils.str.getUnitDataFromGUIDDirect(GUID)
+	local unitType, _, _, _, _, npcID = strsplit("-", GUID or "");
 	return unitType, npcID;
+end
+
+function Utils.str.getUnitDataFromGUID(unitID)
+	return Utils.str.getUnitDataFromGUIDDirect(UnitGUID(unitID));
 end
 
 function Utils.str.getUnitNPCID(unitID)
@@ -467,6 +471,21 @@ local textColorIsReadableOnBackground = function(textColor)
 end
 
 Utils.color.textColorIsReadableOnBackground = textColorIsReadableOnBackground;
+
+Utils.color.lightenColorUntilItIsReadable = function(textColor)
+	-- If the color is too dark to be displayed in the tooltip, we will ligthen it up a notch
+	while not textColorIsReadableOnBackground(textColor) do
+		textColor.r = textColor.r + 0.01;
+		textColor.g = textColor.g + 0.01;
+		textColor.b = textColor.b + 0.01;
+	end
+
+	if textColor.r > 1 then textColor.r = 1 end
+	if textColor.g > 1 then textColor.g = 1 end
+	if textColor.b > 1 then textColor.b = 1 end
+
+	return textColor;
+end
 
 --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -- Math
