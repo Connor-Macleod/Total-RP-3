@@ -92,6 +92,21 @@ function Bookworm.API.init()
 	function Bookworm.API.onButtonClicked()
 		local itemID, item = createItem();
 
+		-- Add opening sound on use
+		item.SC.onUse.ST["2"] = {
+			["e"] = {
+				{
+					["id"] = "sound_id_self",
+					["args"] = {
+						"SFX",
+						831,
+					},
+				},
+			},
+			["t"] = "list",
+		};
+		item.SC.onUse.ST["1"].n = "2";
+
 		item.BA.NA = Bookworm.book.getItem();
 		if Bookworm.book.author() then
 			item.BA.LE = ITEM_TEXT_FROM .. " " .. Bookworm.book.author();
