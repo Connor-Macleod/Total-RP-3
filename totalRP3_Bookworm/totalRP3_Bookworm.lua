@@ -7,20 +7,41 @@
 -------------------------------------------------------------------
 local _, Bookworm = ...;
 
-Bookworm.log = print;
+function Bookworm.log(...)
+	if not TRP3_DEBUG then return end;
+	local tab = 1
+	for i = 1,10 do
+		if GetChatWindowInfo(i) == "Logs" then
+			tab = i
+			break
+		end
+	end
+	_G["ChatFrame"..tab]:AddMessage("|cffaaaaaa[Total RP 3: Bookworm]|r " .. strjoin(" ", tostringall(...)));
+end;
+
+function Bookworm.logEvent(event, ...)
+	Bookworm.log(("|cff62D96B[EVENT FIRED : %s]|r"):format(event), ...);
+end
+
+function Bookworm.logValue(valueName, ...)
+	Bookworm.log(("|cff669EFF[%s]|r = "):format(valueName), ...);
+end
+function Bookworm.logTexture(valueName, texture, ...)
+	Bookworm.log(("|cff669EFF[%s]|r = "):format(valueName), ("\124T%s:20:20\124t"):format(texture or ""), ...);
+end
 
 function Bookworm.init()
 
 	local registerHandler = TRP3_API.utils.event.registerHandler;
 
-	Bookworm.log = TRP3_API.utils.log.log;
+	setfenv(1, Bookworm);
 
-	Bookworm.buttons.init();
-	Bookworm.book.init();
-	Bookworm.API.init();
+	Button.init();
+	Book.init();
+	API.init();
 
-	registerHandler("ITEM_TEXT_READY", Bookworm.API.onItemTextReady);
-	registerHandler("ITEM_TEXT_CLOSED", Bookworm.API.onItemTextClosed);
+	registerHandler("ITEM_TEXT_READY", API.onItemTextReady);
+	registerHandler("ITEM_TEXT_CLOSED", API.onItemTextClosed);
 end
 
 local MODULE_STRUCTURE = {
