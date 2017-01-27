@@ -113,6 +113,8 @@
     </Frame>
 	
 	<Script file="module_management.lua"/>
+
+	<Script file="callout_tutorials\callout_tutorials.lua"/>
 	
 	<Script file="flyway\flyway.lua"/>
 	<Script file="flyway\flyway_patches.lua"/>

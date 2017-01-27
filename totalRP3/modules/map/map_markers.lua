@@ -385,4 +385,16 @@ TRP3_API.events.listenToEvent(TRP3_API.events.WORKFLOW_ON_LOADED, function()
 			UIDropDownMenu_Initialize(WorldMapFrameDropDown, WorldMapTrackingOptionsDropDown_Initialize, "MENU")
 		end
 	end)
+	
+	
+	TRP3_API.calloutTutorials.registerNewSimpleTextTutorial({
+		["ID"] = "worldmap_dropdown",
+		["content"] = "You start Total RP 3 scans (like seeing the location of other Total RP 3 users) from here now!",
+		["frame"] = WorldMapFrame.UIElementsFrame.TrackingOptionsButton.Button,
+		["direction"] = "UP",
+		["event"] = "WORLD_MAP_UPDATE",
+		["check"] = function()
+			return WorldMapFrame.UIElementsFrame.TrackingOptionsButton.Button:IsVisible();
+		end
+	});
 end);
