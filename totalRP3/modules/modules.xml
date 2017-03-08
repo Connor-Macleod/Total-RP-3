@@ -132,4 +132,6 @@
 	<Include file="map\map.xml"/>
 
 	<Script file="tiptac\tiptac.lua"/>
+
+	<Include file="argiHelper\argiHelper.xml"/>
 </Ui>
