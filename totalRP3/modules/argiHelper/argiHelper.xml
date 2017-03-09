@@ -3,7 +3,7 @@
 
     <!--
 	Total RP 3
-	Copyright 2014 Sylvain Cossement (telkostrasz@telkostrasz.be)
+	Copyright 2017 Saelora (mail@saelora.com)
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 -->
 
     <Script file="argiHelper.lua"/>
+    <Script file="argiHelpTree.lua"/>
 
     <frame name="argiHelpFrame" parent="TRP3_MainFrame">
         <Size x="195" y="195"/>
@@ -27,21 +28,43 @@
             <Anchor point="BOTTOMLEFT" x="20" y="30"/>
         </Anchors>
         <frames>
-            <CinematicModel name="argiHelpFrameModel" inherits="CharacterModelFrame" setAllPoints="true">
+
+            <CinematicModel parentKey="model" inherits="CharacterModelFrame" setAllPoints="true">
 
                 <Scripts>
                     <OnLoad>
-                            self:SetDisplayInfo("61128");
-                            self:InitializeCamera(1.5);
-                            self:SetTargetDistance(0);
-                            self:SetFacing(math.pi/4);
-                            TRP3_API.ui.argi.registerFrameAnimation(self)
+                        TRP3_API.ui.argi.initArgi()
                     </OnLoad>
-                    <OnShow>
-                            TRP3_API.ui.argi.animateArrival(self);
-                    </OnShow>
                 </Scripts>
             </CinematicModel>
+            <frame name="argiMessageFrame" parentKey="speech" hidden="true">
+                <Backdrop bgFile="Interface\Tooltips\ChatBubble-Background"
+                          edgeFile="Interface\Tooltips\ChatBubble-Backdrop" tile="true">
+                    <EdgeSize val="16"/>
+                    <TileSize val="32"/>
+                    <BackgroundInsets left="16" right="16" top="16" bottom="16"/>
+                </Backdrop>
+                <Size x="140" y="40"/>
+                <Anchors>
+                    <Anchor point="BOTTOM" y="135"/>
+                </Anchors>
+                <layers>
+                    <layer level="OVERLAY">
+                        <texture file="Interface\Tooltips\ChatBubble-Tail">
+                            <Anchors>
+                                <Anchor point="BOTTOM" y="-13"/>
+                            </Anchors>
+                            <Size x="16" y="16"/>
+                        </texture>
+                        <FontString text="Hi, I'm Argi!" inherits="ChatBubbleFont" parentKey="text">
+                            <Size x="165"/>
+                            <Anchors>
+                                <Anchor point="LEFT" x="16"/>
+                            </Anchors>
+                        </FontString>
+                    </layer>
+                </layers>
+            </frame>
         </frames>
     </frame>
 
